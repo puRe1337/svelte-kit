@@ -5,14 +5,18 @@
 		add,
 		get_count,
 		set_count,
-		set_count_server,
+		set_count_server_refresh,
+		set_count_server_set,
 		resolve_deferreds
 	} from './query-command.remote.js';
+	import { q } from './accessing-env.remote';
 
 	let { data } = $props();
 
 	let command_result = $state(null);
-	let release;
+
+	// we just want it not to be treeshaken away
+	q;
 
 	const count = browser ? get_count() : null; // so that we get a remote request in the browser
 </script>
@@ -33,9 +37,11 @@
 	<p id="command-pending">Command pending: {set_count.pending}</p>
 {/if}
 
-<button onclick={() => set_count_server(0)} id="reset-btn">reset</button>
+<button onclick={() => set_count_server_refresh(0)} id="reset-btn">reset</button>
 
 <button onclick={() => count.refresh()} id="refresh-btn">Refresh</button>
+
+<button onclick={() => count.set(999)} id="set-btn">Set</button>
 
 <button
 	onclick={async () => {
@@ -55,7 +61,7 @@
 </button>
 <button
 	onclick={async () => {
-		command_result = await set_count_server(4);
+		command_result = await set_count_server_refresh(4);
 	}}
 	id="multiply-server-refresh-btn"
 >
@@ -79,6 +85,14 @@
 	id="command-deferred-btn"
 >
 	command (deferred)
+</button>
+<button
+	onclick={async () => {
+		command_result = await set_count_server_set(8);
+	}}
+	id="multiply-server-set-btn"
+>
+	command (query server set)
 </button>
 
 <button id="refresh-all" onclick={() => refreshAll()}>refreshAll</button>
